@@ -86,7 +86,7 @@ extract_outcome_data_internal <- function(snps, outcomes, proxies = TRUE, rsq = 
 	{
 
 		d <- httr::GET("http://www.bing.com")
-		while(class(d) == "response")){
+		while(class(d) == "response"){
 			d <- ieugwasr::associations(
 				variants = snps, 
 				id = outcomes,
@@ -115,7 +115,7 @@ extract_outcome_data_internal <- function(snps, outcomes, proxies = TRUE, rsq = 
 				x <- plyr::mutate(x)
 				message(" [>] ", x$chunk_id[1], " of ", max(splits$chunk_id), " chunks")
 				out <- httr::GET("http://www.bing.com")
-				while(class(out) == "response")){
+				while(class(out) == "response"){
 					out <- ieugwasr::associations(
 						variants = x$snps, 
 						id = outcomes[i],
@@ -149,7 +149,7 @@ extract_outcome_data_internal <- function(snps, outcomes, proxies = TRUE, rsq = 
 				message(" [>] ", x$chunk_id[1], " of ", max(splits$chunk_id), " chunks")
 
 				out <- httr::GET("http://www.bing.com")
-				while(class(out) == "response")){
+				while(class(out) == "response"){
 					out <- ieugwasr::associations(
 						variants = snps[i], 
 						id = x$outcomes,
