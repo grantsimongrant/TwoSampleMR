@@ -85,16 +85,19 @@ extract_outcome_data_internal <- function(snps, outcomes, proxies = TRUE, rsq = 
 	if((length(snps) < splitsize & length(outcomes) < splitsize) | (length(outcomes) < splitsize & length(snps) < splitsize))
 	{
 
-		d <- ieugwasr::associations(
-			variants = snps, 
-			id = outcomes,
-			proxies = proxies,
-			r2 = rsq,
-			align_alleles = align_alleles,
-			palindromes = palindromes,
-			maf_threshold = maf_threshold,
-			access_token=access_token
-		)
+		d <- httr::GET("http://www.bing.com")
+		while(class(d) == "response")){
+			d <- ieugwasr::associations(
+				variants = snps, 
+				id = outcomes,
+				proxies = proxies,
+				r2 = rsq,
+				align_alleles = align_alleles,
+				palindromes = palindromes,
+				maf_threshold = maf_threshold,
+				access_token=access_token
+			)
+		}
 		if(!is.data.frame(d)) d <- data.frame()
 
 	} else if(length(snps) > length(outcomes)) {
@@ -111,16 +114,19 @@ extract_outcome_data_internal <- function(snps, outcomes, proxies = TRUE, rsq = 
 			{
 				x <- plyr::mutate(x)
 				message(" [>] ", x$chunk_id[1], " of ", max(splits$chunk_id), " chunks")
-				out <- ieugwasr::associations(
-					variants = x$snps, 
-					id = outcomes[i],
-					proxies = proxies,
-					r2 = rsq,
-					align_alleles = align_alleles,
-					palindromes = palindromes,
-					maf_threshold = maf_threshold,
-					access_token=access_token
-				)
+				out <- httr::GET("http://www.bing.com")
+				while(class(out) == "response")){
+					out <- ieugwasr::associations(
+						variants = x$snps, 
+						id = outcomes[i],
+						proxies = proxies,
+						r2 = rsq,
+						align_alleles = align_alleles,
+						palindromes = palindromes,
+						maf_threshold = maf_threshold,
+						access_token=access_token
+					)
+				}
 				if(!is.data.frame(out)) out <- data.frame()
 				return(out)
 			})
@@ -142,16 +148,19 @@ extract_outcome_data_internal <- function(snps, outcomes, proxies = TRUE, rsq = 
 				x <- plyr::mutate(x)
 				message(" [>] ", x$chunk_id[1], " of ", max(splits$chunk_id), " chunks")
 
-				out <- ieugwasr::associations(
-					variants = snps[i], 
-					id = x$outcomes,
-					proxies = proxies,
-					r2 = rsq,
-					align_alleles = align_alleles,
-					palindromes = palindromes,
-					maf_threshold = maf_threshold,
-					access_token=access_token
-				)
+				out <- httr::GET("http://www.bing.com")
+				while(class(out) == "response")){
+					out <- ieugwasr::associations(
+						variants = snps[i], 
+						id = x$outcomes,
+						proxies = proxies,
+						r2 = rsq,
+						align_alleles = align_alleles,
+						palindromes = palindromes,
+						maf_threshold = maf_threshold,
+						access_token=access_token
+					)
+				}
 
 				if(!is.data.frame(out)) out <- data.frame()
 				return(out)
