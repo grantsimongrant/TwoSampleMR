@@ -830,19 +830,24 @@ mr_median <- function(dat, parameters=default_parameters())
 #' }
 mr_ivw <- function(b_exp, b_out, se_exp, se_out, parameters=default_parameters())
 {
-	if(sum(!is.na(b_exp) & !is.na(b_out) & !is.na(se_exp) & !is.na(se_out)) < 2)
-	return(list(b=NA, se=NA, pval=NA, nsnp=NA))
-
-	ivw.res <- summary(stats::lm(b_out ~ -1 + b_exp, weights = 1/se_out^2))
-	b <- ivw.res$coef["b_exp","Estimate"]
-	se <- ivw.res$coef["b_exp","Std. Error"]/min(1,ivw.res$sigma) #sigma is the residual standard error
-	pval <- 2 * stats::pnorm(abs(b/se), lower.tail=FALSE)
-	Q_df <- length(b_exp) - 1
-	Q <- ivw.res$sigma^2 * Q_df
-	Q_pval <- stats::pchisq(Q, Q_df, lower.tail=FALSE)
-	# from formula phi =  Q/DF rearranged to to Q = phi*DF, where phi is sigma^2
-	# Q.ivw<-sum((1/(se_out/b_exp)^2)*(b_out/b_exp-ivw.reg.beta)^2)
-	return(list(b = b, se = se, pval = pval, nsnp=length(b_exp), Q = Q, Q_df = Q_df, Q_pval = Q_pval))
+	if(sum(!is.na(b_exp) & !is.na(b_out) & !is.na(se_exp) & !is.na(se_out)) < 2){
+		return(list(b=NA, se=NA, pval=NA, nsnp=NA))
+	}else{
+        tryCatch({
+            ivw.res <- summary(stats::lm(b_out ~ -1 + b_exp, weights = 1/se_out^2))
+            b <- ivw.res$coef["b_exp","Estimate"]
+            se <- ivw.res$coef["b_exp","Std. Error"]/min(1,ivw.res$sigma) #sigma is the residual standard error
+            pval <- 2 * stats::pnorm(abs(b/se), lower.tail=FALSE)
+            Q_df <- length(b_exp) - 1
+            Q <- ivw.res$sigma^2 * Q_df
+            Q_pval <- stats::pchisq(Q, Q_df, lower.tail=FALSE)
+            # from formula phi =  Q/DF rearranged to to Q = phi*DF, where phi is sigma^2
+            # Q.ivw<-sum((1/(se_out/b_exp)^2)*(b_out/b_exp-ivw.reg.beta)^2)
+            return(list(b = b, se = se, pval = pval, nsnp=length(b_exp), Q = Q, Q_df = Q_df, Q_pval = Q_pval))
+        }, error = function(e) {
+            return(list(b=NA, se=NA, pval=NA, nsnp=NA))
+        })
+    }
 }
 
 #' Unweighted regression
