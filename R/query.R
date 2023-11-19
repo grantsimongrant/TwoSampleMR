@@ -37,30 +37,42 @@ extract_outcome_data <- function(snps, outcomes, proxies = TRUE, rsq = 0.8, alig
 	outcomes <- ieugwasr::legacy_ids(unique(outcomes))
 
 	snps <- unique(snps)
-	firstpass <- extract_outcome_data_internal(snps, outcomes, proxies = FALSE, access_token=access_token, splitsize = splitsize)
-
-	if(proxies)
-	{
-		for(i in 1:length(outcomes))
+	if( length(outcomes)<length(snps) ){
+		firstpass <- extract_outcome_data_internal(snps, outcomes, proxies = FALSE, access_token=access_token, splitsize = splitsize)
+	
+		if(proxies)
 		{
-			if(is.null(firstpass))
+			for(i in 1:length(outcomes))
 			{
-				missedsnps <- snps
-			} else {
-				missedsnps <- snps[!snps %in% subset(firstpass, id.outcome == outcomes[i])$SNP]
-			}
-			if(length(missedsnps)>0)
-			{
-				message("Finding proxies for ", length(missedsnps), " SNPs in outcome ", outcomes[i])
-				temp <- extract_outcome_data_internal(missedsnps, outcomes[i], proxies = TRUE, rsq, align_alleles, palindromes, maf_threshold, access_token = access_token, splitsize = proxy_splitsize)
-				if(!is.null(temp))
+				if(is.null(firstpass))
 				{
-					firstpass <- plyr::rbind.fill(firstpass, temp)
+					missedsnps <- snps
+				} else {
+					missedsnps <- snps[!snps %in% subset(firstpass, id.outcome == outcomes[i])$SNP]
+				}
+				if(length(missedsnps)>0)
+				{
+					message("Finding proxies for ", length(missedsnps), " SNPs in outcome ", outcomes[i])
+					temp <- extract_outcome_data_internal(missedsnps, outcomes[i], proxies = TRUE, rsq, align_alleles, palindromes, maf_threshold, access_token = access_token, splitsize = proxy_splitsize)
+					if(!is.null(temp))
+					{
+						firstpass <- plyr::rbind.fill(firstpass, temp)
+					}
 				}
 			}
 		}
 	}
 
+
+	if( length(outcomes)>length(snps) ){
+		if(proxies)
+		{
+			firstpass <- extract_outcome_data_internal(snps, outcomes, proxies = TRUE, access_token=access_token, splitsize = splitsize)
+		}else{
+			firstpass <- extract_outcome_data_internal(snps, outcomes, proxies = FALSE, access_token=access_token, splitsize = splitsize)
+		}
+
+		
 	return(firstpass)
 }
 
