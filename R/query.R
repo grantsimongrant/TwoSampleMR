@@ -71,7 +71,7 @@ extract_outcome_data <- function(snps, outcomes, proxies = TRUE, rsq = 0.8, alig
 		}else{
 			firstpass <- extract_outcome_data_internal(snps, outcomes, proxies = FALSE, access_token=access_token, splitsize = splitsize)
 		}
-
+	}
 		
 	return(firstpass)
 }
